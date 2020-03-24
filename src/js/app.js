@@ -378,7 +378,7 @@ function api() {
 
 api();
 
-setInterval(function(){ api(); }, 50000);
+setInterval(function(){ api(); }, 1800000);
 
 
 // Promise.all([
