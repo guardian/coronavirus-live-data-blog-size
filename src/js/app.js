@@ -37,6 +37,8 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 
 	const aus_latest = latest.filter(d => d.Country_Region == "Australia")[0]['Confirmed']
 
+	//latest
+
 	console.log(aus_latest)
 	var data = {
 		"Australia":{},
@@ -154,9 +156,20 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 	ukFinalDeaths = compare([ukManualDeaths, ukAutoDeaths])
 	ukFinalRecovered = compare([ukManualRecovered, ukAutoRecovered])
 
-	data["Australia"]['confirmed'] = format(ausFinalConfirmed)
-	data["Australia"]['deaths'] = format(ausFinalDeaths)
-	data["Australia"]['recovered'] = format(recovered[recovered.length-1]['Australia'])
+	//console.log('-------------- Yo yo --------------')
+	//console.log(format(ausFinalConfirmed))
+	//console.log(format(ausManualConfirmed))
+	//console.log(format(ausFinalDeaths))
+	//console.log(format(recovered[recovered.length-1]['Australia']))
+
+	var ausActive = parseInt(aus.sheets['latest totals'][8]['Active cases']) // //Confirmed cases (cumulative)
+	var ausDeaths = parseInt(aus.sheets['latest totals'][8]['Deaths'])
+	var ausRecovered = parseInt(aus.sheets['latest totals'][8]['Recovered'])
+
+
+	data["Australia"]['confirmed'] = format(ausActive) // ausFinalConfirmed
+	data["Australia"]['deaths'] = format(ausDeaths) // ausFinalDeaths
+	data["Australia"]['recovered'] = format(ausRecovered) //recovered[recovered.length-1]['Australia']
 
 	data["United Kingdom"]['confirmed'] = format(ukFinalConfirmed)
 	data["United Kingdom"]['deaths'] = format(ukFinalDeaths)
@@ -187,6 +200,7 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 
 	ractive.on({
 		world: function ( event ) {
+			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["Total"])
 			country = 'Total'
 			countries.forEach(item => {
@@ -200,6 +214,7 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 		},
 		us: function ( event ) {
 			console.log("us")
+			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["US"])
 			country = 'US'
 			countries.forEach(item => {
@@ -214,6 +229,7 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 		},
 		uk: function ( event ) {
 			console.log("uk")
+			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["United Kingdom"])
 			country = 'United Kingdom'
 			countries.forEach(item => {
@@ -228,6 +244,7 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 		},
 		aus: function ( event ) {
 			console.log("aus")
+			ractive.set('label', 'Active cases')
 			ractive.set('location', data["Australia"])
 			country = 'Australia'
 			countries.forEach(item => {
