@@ -1,10 +1,11 @@
 
 
 <div class="row buttons">
-	<div class="btn btn-selected world" on-click="world">World</div>
-	<div class="btn us" on-click="us">US</div>
-	<div class="btn uk" on-click="uk">UK</div>
-	<div class="btn aus" on-click="aus">Aus</div>
+
+    {{#countries}}
+        <div class="btn {{value}} {{#if active}}btn-selected{{/if}}" on-click="[value]">{{label}}</div>
+    {{/countries}}
+
 </div>	
 
 <div class="headline-container">
@@ -13,7 +14,7 @@
 
 <div class="row bigNumbers">
 	<div id="cases" class="numWrapper">
-		<p style="color: rgb(199, 0, 0);">Confirmed cases</p>
+		<p style="color: rgb(199, 0, 0);">{{label}}</p>
 		<span style="color: rgb(199, 0, 0);">{{location.confirmed}}</span>
 	</div>
 	<div id="deaths" class="numWrapper">

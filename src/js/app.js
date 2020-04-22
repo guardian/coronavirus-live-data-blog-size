@@ -2,16 +2,42 @@ import template from '../templates/template.html'
 import Ractive from 'ractive'
 import * as d3 from "d3"
 
-function init(country, confirmed, confirmed_daily, deaths, recovered, aus, overrides, latest) {
+var country = "Total"
+
+var countries =[{
+    	"value" : "world",
+    	"label" : "World",
+    	"active" : true,
+    	"country" : "Total"
+    },{
+    	"value" : "us",
+    	"label" : "US",
+    	"active" : false,
+    	"country" : "US"
+    },{
+    	"value" : "uk",
+    	"label" : "UK",
+    	"active" : false,
+    	"country" : "United Kingdom"
+    },{
+    	"value" : "aus",
+    	"label" : "AUS",
+    	"active" : false,
+    	"country" : "Australia"
+    }]
+
+function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, latest) {
 
 	// console.log(confirmed)
 	// console.log(confirmed_daily)
 	// console.log(deaths)
 	// console.log(recovered)
 	
-	console.log(latest);
+	// console.log(latest);
 
 	const aus_latest = latest.filter(d => d.Country_Region == "Australia")[0]['Confirmed']
+
+	//latest
 
 	console.log(aus_latest)
 	var data = {
@@ -130,9 +156,20 @@ function init(country, confirmed, confirmed_daily, deaths, recovered, aus, overr
 	ukFinalDeaths = compare([ukManualDeaths, ukAutoDeaths])
 	ukFinalRecovered = compare([ukManualRecovered, ukAutoRecovered])
 
-	data["Australia"]['confirmed'] = format(ausFinalConfirmed)
-	data["Australia"]['deaths'] = format(ausFinalDeaths)
-	data["Australia"]['recovered'] = format(recovered[recovered.length-1]['Australia'])
+	//console.log('-------------- Yo yo --------------')
+	//console.log(format(ausFinalConfirmed))
+	//console.log(format(ausManualConfirmed))
+	//console.log(format(ausFinalDeaths))
+	//console.log(format(recovered[recovered.length-1]['Australia']))
+
+	var ausActive = parseInt(aus.sheets['latest totals'][8]['Active cases']) // //Confirmed cases (cumulative)
+	var ausDeaths = parseInt(aus.sheets['latest totals'][8]['Deaths'])
+	var ausRecovered = parseInt(aus.sheets['latest totals'][8]['Recovered'])
+
+
+	data["Australia"]['confirmed'] = format(ausActive) // ausFinalConfirmed
+	data["Australia"]['deaths'] = format(ausDeaths) // ausFinalDeaths
+	data["Australia"]['recovered'] = format(ausRecovered) //recovered[recovered.length-1]['Australia']
 
 	data["United Kingdom"]['confirmed'] = format(ukFinalConfirmed)
 	data["United Kingdom"]['deaths'] = format(ukFinalDeaths)
@@ -153,43 +190,71 @@ function init(country, confirmed, confirmed_daily, deaths, recovered, aus, overr
 			target: "#outer-wrapper",
 			template: template,
 			data: { 
-					location:data["Total"],
+					location:data[country],
 					ausManualTimestamp:ausManualTimestamp,
-					autoTimestamp:autoTimestamp
+					autoTimestamp:autoTimestamp,
+					countries:countries
 				}
 		});
 
 
 	ractive.on({
 		world: function ( event ) {
+			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["Total"])
 			country = 'Total'
-			d3.selectAll(".btn").classed("btn-selected", false);
-			d3.select(".world").classed("btn-selected", true);
+			countries.forEach(item => {
+				item.active = (item.country === country) ? true : false ;
+			})
+			ractive.set('countries', countries)
+
+			//d3.selectAll(".btn").classed("btn-selected", false);
+			//d3.select(".world").classed("btn-selected", true);
 			drawChart(confirmed_daily, country);
 		},
 		us: function ( event ) {
 			console.log("us")
+			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["US"])
 			country = 'US'
-			d3.selectAll(".btn").classed("btn-selected", false);
-			d3.select(".us").classed("btn-selected", true);
+			countries.forEach(item => {
+				item.active = (item.country === country) ? true : false ;
+			})
+			ractive.set('countries', countries)
+		
+
+			//d3.selectAll(".btn").classed("btn-selected", false);
+			//d3.select(".us").classed("btn-selected", true);
 			drawChart(confirmed_daily, country);
 		},
 		uk: function ( event ) {
 			console.log("uk")
+			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["United Kingdom"])
 			country = 'United Kingdom'
-			d3.selectAll(".btn").classed("btn-selected", false);
-			d3.select(".uk").classed("btn-selected", true);
+			countries.forEach(item => {
+				item.active = (item.country === country) ? true : false ;
+			})
+			ractive.set('countries', countries)
+		
+
+			//d3.selectAll(".btn").classed("btn-selected", false);
+			//d3.select(".uk").classed("btn-selected", true);
 			drawChart(confirmed_daily, country);
 		},
 		aus: function ( event ) {
 			console.log("aus")
+			ractive.set('label', 'Active cases')
 			ractive.set('location', data["Australia"])
 			country = 'Australia'
-			d3.selectAll(".btn").classed("btn-selected", false);
-			d3.select(".aus").classed("btn-selected", true);
+			countries.forEach(item => {
+				item.active = (item.country === country) ? true : false ;
+			})
+			ractive.set('countries', countries)
+		
+
+			//d3.selectAll(".btn").classed("btn-selected", false);
+			//d3.select(".aus").classed("btn-selected", true);
 			drawChart(confirmed_daily, country);
 		}
 	});
@@ -311,18 +376,26 @@ function init(country, confirmed, confirmed_daily, deaths, recovered, aus, overr
 
 };
 
-Promise.all([
-	d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/confirmed.json'),
-	d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/confirmed_daily.json'),
-	d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/deaths.json'),
-	d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/recovered.json'),
-	d3.json('https://interactive.guim.co.uk/docsdata/1q5gdePANXci8enuiS4oHUJxcxC13d6bjMRSicakychE.json'),
-	d3.json('https://interactive.guim.co.uk/docsdata/1jy3E-hIVvbBAyUx7SY3IfUADB85mGoaR2tobYu9iifA.json'),
-	d3.json("https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/latest.json")
-])
-.then((results) =>  {
-	init('Total', results[0], results[1], results[2], results[3], results[4], results[5], results[6])
-})
+function api() {
+
+	Promise.all([
+		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/confirmed.json'),
+		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/confirmed_daily.json'),
+		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/deaths.json'),
+		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/recovered.json'),
+		d3.json('https://interactive.guim.co.uk/docsdata/1q5gdePANXci8enuiS4oHUJxcxC13d6bjMRSicakychE.json'),
+		d3.json('https://interactive.guim.co.uk/docsdata/1jy3E-hIVvbBAyUx7SY3IfUADB85mGoaR2tobYu9iifA.json'),
+		d3.json("https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/latest.json")
+	])
+	.then((results) =>  {
+		init(results[0], results[1], results[2], results[3], results[4], results[5], results[6])
+	})
+
+}
+
+api();
+
+setInterval(function(){ api(); }, 1800000);
 
 
 // Promise.all([
