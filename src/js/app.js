@@ -66,7 +66,7 @@ function init(country, confirmed, confirmed_daily, deaths, recovered, aus, overr
 	var ausManualRecovered2 = parseInt(overrides.sheets['Sheet1'][3]['Recovered'])
 	
 	var ausAutoConfirmed = latest.filter(d => d.Country_Region == "Australia")[0]['Confirmed']
-	var ausAutoDeaths = latest.filter(d => d.Country_Region == "Australia")[0]['Deaths']
+	// var ausAutoDeaths = latest.filter(d => d.Country_Region == "Australia")[0]['Deaths']
 
 	var totalManualConfirmed = niceNumber(overrides.sheets['Sheet1'][0]['Cases'])
 	var totalManualDeaths = niceNumber(overrides.sheets['Sheet1'][0]['Deaths'])
@@ -115,8 +115,8 @@ function init(country, confirmed, confirmed_daily, deaths, recovered, aus, overr
 		return [].slice.call(things).sort(sorter)[0]
 	}
 
-	ausFinalConfirmed = compare([ausManualConfirmed, ausManualConfirmed2, ausAutoConfirmed])
-	ausFinalDeaths = compare([ausManualDeaths, ausManualDeaths2, ausAutoDeaths])
+	ausFinalConfirmed = compare([ausManualConfirmed, ausManualConfirmed2])
+	ausFinalDeaths = compare([ausManualDeaths, ausManualDeaths2])
 
 	totalFinalConfirmed = compare([totalManualConfirmed, totalAutoConfirmed])
 	totalFinalDeaths = compare([totalManualDeaths, totalAutoDeaths])
