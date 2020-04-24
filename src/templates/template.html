@@ -1,30 +1,34 @@
 
 
 <div class="row buttons">
-
-    {{#countries}}
-        <div class="btn {{value}} {{#if active}}btn-selected{{/if}}" on-click="[value]">{{label}}</div>
-    {{/countries}}
-
-</div>	
+	<div class="btn btn-selected world" on-click="world">World</div>
+	<div class="btn us" on-click="us">US</div>
+	<div class="btn uk" on-click="uk">UK</div>
+	<div class="btn aus" on-click="aus">Aus</div>
+</div>
 
 <div class="headline-container">
 	<h3>Coronavirus latest totals</h3>
 </div>	
 
-<div class="row bigNumbers">
+<div class="row bigNumbers {{layout}}">
 	<div id="cases" class="numWrapper">
 		<p style="color: rgb(199, 0, 0);">{{label}}</p>
 		<span style="color: rgb(199, 0, 0);">{{location.confirmed}}</span>
 	</div>
+
+	{{#if location.name == "Australia"}}
+	<div id="recovered" class="numWrapper">
+		<p style="color: #005689;">Recovered**</p>
+		<span style="color: #005689;">{{location.recovered}}</span>
+	</div>
+	{{/if}}
+
 	<div id="deaths" class="numWrapper">
 		<p>Deaths</p>
 		<span>{{location.deaths}}</span>
 	</div>
-<!-- 	<div id="recovered" class="numWrapper">
-		<p style="color: #005689;">Recovered</p>
-		<span style="color: #005689;">{{location.recovered}}</span>
-	</div> -->
+
 </div>
 
 <div class="row casesOverTime">
@@ -37,5 +41,5 @@
 </div>	
 
 <div class="row notes">
-Sources: cumulative and daily figures are from <a href="https://github.com/CSSEGISandData/COVID-19">Johns Hopkins University</a>. For Australia, more up-to-date figures from state and territory health departments are used for the totals, but not for the chart. Australian data last updated {{ausManualTimestamp}}, Johns Hopkins University data last updated {{autoTimestamp}}. Recovered cases removed due to unreliable data
+Sources: cumulative and daily figures are from <a href="https://github.com/CSSEGISandData/COVID-19">Johns Hopkins University</a>. For Australia, more up-to-date figures from state and territory health departments are used. {{#if location.name == "Australia"}}*Active cases is the total number of cases with recovered cases and deaths subtracted. **The NSW recovered cases figure has been estimated by the federal Department of Health, and is updated irregularly.{{/if}} Australian data last updated {{ausManualTimestamp}}, Johns Hopkins University data last updated {{autoTimestamp}}.
 </div>	

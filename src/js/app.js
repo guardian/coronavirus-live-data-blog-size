@@ -2,31 +2,7 @@ import template from '../templates/template.html'
 import Ractive from 'ractive'
 import * as d3 from "d3"
 
-var country = "Total"
-
-var countries =[{
-    	"value" : "world",
-    	"label" : "World",
-    	"active" : true,
-    	"country" : "Total"
-    },{
-    	"value" : "us",
-    	"label" : "US",
-    	"active" : false,
-    	"country" : "US"
-    },{
-    	"value" : "uk",
-    	"label" : "UK",
-    	"active" : false,
-    	"country" : "United Kingdom"
-    },{
-    	"value" : "aus",
-    	"label" : "AUS",
-    	"active" : false,
-    	"country" : "Australia"
-    }]
-
-function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, latest) {
+function init(country, confirmed_daily, aus, overrides, latest, aus_daily) {
 
 	// console.log(confirmed)
 	// console.log(confirmed_daily)
@@ -41,11 +17,12 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 
 	console.log(aus_latest)
 	var data = {
-		"Australia":{},
-		"United Kingdom":{},
-		"US":{},
-		"Total":{}
+		"Australia":{"name":"Australia"},
+		"United Kingdom":{"name":"United Kingdom"},
+		"US":{"name":"US"},
+		"Total":{"name":"World"}
 	};
+
 
 	function numberFormat(num) {
         if ( num > 0 ) {
@@ -121,7 +98,7 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 	var timeFormat = d3.timeFormat('%Y-%m-%d')
 	var timeParse = d3.timeParse('%d/%m/%Y')
 	var ausManualTimestamp = aus.sheets['latest totals'][8]['Last updated']
-	var autoTimestamp = confirmed[confirmed.length-1]['index']
+	var autoTimestamp = confirmed_daily[confirmed_daily.length-1]['index']
 
 	var ausFinalDeaths, ausFinalConfirmed, totalFinalDeaths, totalFinalConfirmed, totalFinalRecovered, usFinalDeaths, usFinalConfirmed, usFinalRecovered, ukFinalDeaths, ukFinalConfirmed, ukFinalRecovered
 
@@ -191,22 +168,22 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 			template: template,
 			data: { 
 					location:data[country],
+					layout: "two",
+					label: "Confirmed cases",
 					ausManualTimestamp:ausManualTimestamp,
-					autoTimestamp:autoTimestamp,
-					countries:countries
+					autoTimestamp:autoTimestamp
 				}
 		});
 
 
 	ractive.on({
 		world: function ( event ) {
-			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["Total"])
+			ractive.set('layout', "two")
+			ractive.set('label', "Confirmed cases")
 			country = 'Total'
-			countries.forEach(item => {
-				item.active = (item.country === country) ? true : false ;
-			})
-			ractive.set('countries', countries)
+			d3.selectAll(".btn").classed("btn-selected", false);
+			d3.select(".world").classed("btn-selected", true);
 
 			//d3.selectAll(".btn").classed("btn-selected", false);
 			//d3.select(".world").classed("btn-selected", true);
@@ -214,28 +191,25 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 		},
 		us: function ( event ) {
 			console.log("us")
-			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["US"])
+			ractive.set('layout', "two")
+			ractive.set('label', "Confirmed cases")
 			country = 'US'
-			countries.forEach(item => {
-				item.active = (item.country === country) ? true : false ;
-			})
-			ractive.set('countries', countries)
-		
-
+			d3.selectAll(".btn").classed("btn-selected", false);
+			d3.select(".us").classed("btn-selected", true);
+	
 			//d3.selectAll(".btn").classed("btn-selected", false);
 			//d3.select(".us").classed("btn-selected", true);
 			drawChart(confirmed_daily, country);
 		},
 		uk: function ( event ) {
 			console.log("uk")
-			ractive.set('label', 'Confirmed cases')
 			ractive.set('location', data["United Kingdom"])
+			ractive.set('layout', "two")
+			ractive.set('label', "Confirmed cases")
 			country = 'United Kingdom'
-			countries.forEach(item => {
-				item.active = (item.country === country) ? true : false ;
-			})
-			ractive.set('countries', countries)
+			d3.selectAll(".btn").classed("btn-selected", false);
+			d3.select(".uk").classed("btn-selected", true);
 		
 
 			//d3.selectAll(".btn").classed("btn-selected", false);
@@ -244,13 +218,12 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 		},
 		aus: function ( event ) {
 			console.log("aus")
-			ractive.set('label', 'Active cases')
 			ractive.set('location', data["Australia"])
+			ractive.set('layout', "three")
+			ractive.set('label', "Active cases*")
 			country = 'Australia'
-			countries.forEach(item => {
-				item.active = (item.country === country) ? true : false ;
-			})
-			ractive.set('countries', countries)
+			d3.selectAll(".btn").classed("btn-selected", false);
+			d3.select(".aus").classed("btn-selected", true);
 		
 
 			//d3.selectAll(".btn").classed("btn-selected", false);
@@ -262,6 +235,8 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 	// ractive.set('data', self.pagerank);
 
 	function drawChart(data, country) {
+
+
 
 		// var yFormat = d3.format(".2s")
 		var width = document.querySelector("#barChart").getBoundingClientRect().width
@@ -379,16 +354,14 @@ function init(confirmed, confirmed_daily, deaths, recovered, aus, overrides, lat
 function api() {
 
 	Promise.all([
-		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/confirmed.json'),
 		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/confirmed_daily.json'),
-		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/deaths.json'),
-		d3.json('https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/recovered.json'),
 		d3.json('https://interactive.guim.co.uk/docsdata/1q5gdePANXci8enuiS4oHUJxcxC13d6bjMRSicakychE.json'),
 		d3.json('https://interactive.guim.co.uk/docsdata/1jy3E-hIVvbBAyUx7SY3IfUADB85mGoaR2tobYu9iifA.json'),
-		d3.json("https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/latest.json")
+		d3.json("https://interactive.guim.co.uk/2020/03/coronavirus-widget-data/latest.json"),
+		d3.json("https://interactive.guim.co.uk/docsdata/1xEijW_9nGVP55-CtmMSyIdOYWP9YYwbs-xZYoAeHEso.json")
 	])
 	.then((results) =>  {
-		init(results[0], results[1], results[2], results[3], results[4], results[5], results[6])
+		init('Total', results[0], results[1], results[2], results[3], results[4])
 	})
 
 }
