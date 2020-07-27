@@ -9,7 +9,7 @@ function init(country, confirmed_daily, aus, overrides, latest, aus_daily) {
 	// console.log(deaths)
 	// console.log(recovered)
 	
-	// console.log(latest);
+	console.log(aus_daily);
 
 	const aus_latest = latest.filter(d => d.Country_Region == "Australia")[0]['Confirmed']
 
@@ -228,15 +228,13 @@ function init(country, confirmed_daily, aus, overrides, latest, aus_daily) {
 
 			//d3.selectAll(".btn").classed("btn-selected", false);
 			//d3.select(".aus").classed("btn-selected", true);
-			drawChart(confirmed_daily, country);
+			drawChart(aus_daily.sheets.data, "Total");
 		}
 	});
 
 	// ractive.set('data', self.pagerank);
 
 	function drawChart(data, country) {
-
-
 
 		// var yFormat = d3.format(".2s")
 		var width = document.querySelector("#barChart").getBoundingClientRect().width
@@ -284,10 +282,13 @@ function init(country, confirmed_daily, aus, overrides, latest, aus_daily) {
 		var xAxis;
 		var yAxis;
 
-		var ticks = x.domain().filter(function(d,i){ return !(i%10); } );
+		console.log(Math.round(x.domain().length / 5))
+
+
+		var ticks = x.domain().filter(function(d,i){ return !(i%Math.round(x.domain().length / 10)); } );
 
 		if (isMobile) {
-			ticks = x.domain().filter(function(d,i){ return !(i%20); } );
+			ticks = x.domain().filter(function(d,i){ return !(i%Math.round(x.domain().length / 5)); } );
 		}	
 
 		if (isMobile) {
